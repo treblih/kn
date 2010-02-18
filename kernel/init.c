@@ -88,6 +88,9 @@ void init_idt()
 	/*-----------------------------------------------------------------------------
 	 *  should have follow the sequence
 	 *  fuck INTEL, occupied 0x08 - 0x0f, in real mode they're reserved for IRQ
+	 *
+	 *  cpu generated exceptions(trap/fault/abort):
+	 *  err_code - eip - cs - eflags
 	 *-----------------------------------------------------------------------------*/
 	init_idt_desc(0x00, _divide_error,		DA_386IGATE, DPL_KERL);
 	init_idt_desc(0x01, _single_step_exception,	DA_386IGATE, DPL_KERL);
@@ -123,6 +126,9 @@ void init_idt()
 
 	/*-----------------------------------------------------------------------------
 	 *  0x20 - 0x2f	IRQ 0-15
+	 *
+	 *  outer hardware interrupts:
+	 *  eip - cs - eflags - esp - ss
 	 *-----------------------------------------------------------------------------*/
 	init_idt_desc(0x20, _hwint00, DA_386IGATE, DPL_KERL);
 	init_idt_desc(0x21, _hwint01, DA_386IGATE, DPL_KERL);
@@ -147,6 +153,7 @@ void init_idt()
 
 	/*-----------------------------------------------------------------------------
 	 *  system call, DPL_USER -> RING-3
+	 *  only 1 with the RING-3 gate desc
 	 *-----------------------------------------------------------------------------*/
 	init_idt_desc(0x90, _sys_call, DA_386IGATE, DPL_USER);
 }

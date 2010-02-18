@@ -36,7 +36,10 @@ void transfer()
 		switch (m.type) {
 		case GET_TICKS:
 			m.u.m3.i1 = ticks;
-			/* notice that the m.source below is needed when u wanna send a msg, just like u name */
+			/*------------------------------------------------------------
+			 * the m.source below is needed when u wanna send a msg,
+			 * just like u name
+			 *-----------------------------------------------------------*/
 			m.source = TRANSFER;
 			send_rec(SEND, &m, pid);
 			break;
@@ -88,12 +91,19 @@ void delay(int ms)
  */
 void schedule()
 {
-	int max = 0;
+	int max = 0;                                            /* just a lookout */
 	PCB *p;
 
 	while (!max) {
 		for (p = pcb_table; p < pcb_table + PROC_SIZE; p++) {
+
+			/*------------------------------------------------------------
+			 *  make sure the blocked one wouldn't be scheduled
+			 *-----------------------------------------------------------*/
 			if (p->flag == 0) {
+				/*----------------------------------------------------
+				 *  choose the richest one in ticks
+				 *---------------------------------------------------*/
 				if (p->ticks > max) {
 					max = p->ticks;
 					proc_current = p;
@@ -101,8 +111,16 @@ void schedule()
 			}
 		}
 
+		/*--------------------------------------------------------------------
+		 *  when all proc's ticks == 0, 
+		 *  init them again using the respective default PRIORITY
+		 *-------------------------------------------------------------------*/
 		if (!max) {
 			for (p = pcb_table; p < pcb_table + PROC_SIZE; p++) {
+
+				/*----------------------------------------------------
+				 *  ignore the blocked one
+				 *---------------------------------------------------*/
 				if (p->flag == 0) {
 					p->ticks = p->priority;
 				}
