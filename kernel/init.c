@@ -104,12 +104,24 @@ void init_idt()
 	init_idt_desc(0x0c, _stack_exception,		DA_386IGATE, DPL_KERL);
 	init_idt_desc(0x0d, _general_protection,	DA_386IGATE, DPL_KERL);
 	init_idt_desc(0x0e, _page_fault,		DA_386IGATE, DPL_KERL);
-	init_idt_desc(0x0f, _copr_error,		DA_386IGATE, DPL_KERL);
+	/* 	      0x0f, INTEL reserved */
+	/* init_idt_desc(0x0f, _copr_error,		DA_386IGATE, DPL_KERL); */
+	init_idt_desc(0x10, _fpu_fault,			DA_386IGATE, DPL_KERL);
+	init_idt_desc(0x11, _align_fault,		DA_386IGATE, DPL_KERL);
+	init_idt_desc(0x12, _machine_abort,		DA_386IGATE, DPL_KERL);
+	init_idt_desc(0x13, _simd_fault,		DA_386IGATE, DPL_KERL);
 
 	/*-----------------------------------------------------------------------------
-	 *  0x10 - 0x1f	reserved
-	 *
 	 *  from now on, set vectors casually
+	 *
+	 *  we must have all vector 0x00 - 0xff set
+	 *  see in 'Linux 0.12 kernel comments' - Interrupt
+	 *-----------------------------------------------------------------------------*/
+	for ( int i = 0x14; i < 0x20; i += 1 ) {
+		init_idt_desc(i, _ignore, DA_386IGATE, DPL_KERL);
+	}
+
+	/*-----------------------------------------------------------------------------
 	 *  0x20 - 0x2f	IRQ 0-15
 	 *-----------------------------------------------------------------------------*/
 	init_idt_desc(0x20, _hwint00, DA_386IGATE, DPL_KERL);
@@ -128,6 +140,10 @@ void init_idt()
 	init_idt_desc(0x2d, _hwint13, DA_386IGATE, DPL_KERL);
 	init_idt_desc(0x2e, _hwint14, DA_386IGATE, DPL_KERL);
 	init_idt_desc(0x2f, _hwint15, DA_386IGATE, DPL_KERL);
+
+	for ( int i = 48; i < 255; i += 1 ) {
+		init_idt_desc(i, _ignore, DA_386IGATE, DPL_KERL);
+	}
 
 	/*-----------------------------------------------------------------------------
 	 *  system call, DPL_USER -> RING-3

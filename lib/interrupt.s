@@ -1,105 +1,124 @@
-.include        "include/sconst.inc"
+	.include        "include/sconst.inc"
 
-.globl	_divide_error
-.globl	_single_step_exception
-.globl	_nmi
-.globl	_breakpoint_exception
-.globl	_overflow
-.globl	_bounds_check
-.globl	_inval_opcode
-.globl	_copr_not_available
-.globl	_double_fault
-.globl	_copr_seg_overrun
-.globl	_inval_tss
-.globl	_segment_not_present
-.globl	_stack_exception
-.globl	_general_protection
-.globl	_page_fault
-.globl	_copr_error
-.globl  _hwint00
-.globl  _hwint01
-.globl  _hwint02
-.globl  _hwint03
-.globl  _hwint04
-.globl  _hwint05
-.globl  _hwint06
-.globl  _hwint07
-.globl  _hwint08
-.globl  _hwint09
-.globl  _hwint10
-.globl  _hwint11
-.globl  _hwint12
-.globl  _hwint13
-.globl  _hwint14
-.globl  _hwint15
+	.globl	_divide_error
+	.globl	_single_step_exception
+	.globl	_nmi
+	.globl	_breakpoint_exception
+	.globl	_overflow
+	.globl	_bounds_check
+	.globl	_inval_opcode
+	.globl	_copr_not_available
+	.globl	_double_fault
+	.globl	_copr_seg_overrun
+	.globl	_inval_tss
+	.globl	_segment_not_present
+	.globl	_stack_exception
+	.globl	_general_protection
+	.globl	_page_fault
+	.globl	_fpu_fault
+	.globl	_align_fault
+	.globl	_machine_abort
+	.globl	_simd_fault
+	.globl	_ignore
 
-.globl  _asm_debug
-.globl  _sys_call
+	.globl  _hwint00
+	.globl  _hwint01
+	.globl  _hwint02
+	.globl  _hwint03
+	.globl  _hwint04
+	.globl  _hwint05
+	.globl  _hwint06
+	.globl  _hwint07
+	.globl  _hwint08
+	.globl  _hwint09
+	.globl  _hwint10
+	.globl  _hwint11
+	.globl  _hwint12
+	.globl  _hwint13
+	.globl  _hwint14
+	.globl  _hwint15
+
+	.globl  _asm_debug
+	.globl  _sys_call
 
 #--------------------------------------------------------------------------------------------
 
 _divide_error:
-	push	$0xFFFFFFFF	# no err code
-	push	$0		# vector_no	= 0
+	push	$0xffffffff	# no err code
+	push	$0x00		# vec_no	= 0
 	jmp	exception
 _single_step_exception:
-	push	$0xFFFFFFFF	# no err code
-	push	$1		# vector_no	= 1
+	push	$0xffffffff	# no err code
+	push	$0x01		# vec_no	= 1
 	jmp	exception
 _nmi:
-	push	$0xFFFFFFFF	# no err code
-	push	$2		# vector_no	= 2
+	push	$0xffffffff	# no err code
+	push	$0x02		# vec_no	= 2
 	jmp	exception
 _breakpoint_exception:
-	push	$0xFFFFFFFF	# no err code
-	push	$3		# vector_no	= 3
+	push	$0xffffffff	# no err code
+	push	$0x03		# vec_no	= 3
 	jmp	exception
 _overflow:
-	push	$0xFFFFFFFF	# no err code
-	push	$4		# vector_no	= 4
+	push	$0xffffffff	# no err code
+	push	$0x04		# vec_no	= 4
 	jmp	exception
 _bounds_check:
-	push	$0xFFFFFFFF	# no err code
-	push	$5		# vector_no	= 5
+	push	$0xffffffff	# no err code
+	push	$0x05		# vec_no	= 5
 	jmp	exception
 _inval_opcode:
-	push	$0xFFFFFFFF	# no err code
-	push	$6		# vector_no	= 6
+	push	$0xffffffff	# no err code
+	push	$0x06		# vec_no	= 6
 	jmp	exception
 _copr_not_available:
-	push	$0xFFFFFFFF	# no err code
-	push	$7		# vector_no	= 7
+	push	$0xffffffff	# no err code
+	push	$0x07		# vec_no	= 7
 	jmp	exception
 _double_fault:
-	push	$8		# vector_no	= 8
+	push	$0x08		# vec_no	= 8
 	jmp	exception
 _copr_seg_overrun:
-	push	$0xFFFFFFFF	# no err code
-	push	$9		# vector_no	= 9
+	push	$0xffffffff	# no err code
+	push	$0x09		# vec_no	= 9
 	jmp	exception
 _inval_tss:
-	push	$10		# vector_no	= A
+	push	$0x0a		# vec_no	= a
 	jmp	exception
 _segment_not_present:
-	push	$11		# vector_no	= B
+	push	$0x0b		# vec_no	= b
 	jmp	exception
 _stack_exception:
-	push	$12		# vector_no	= C
+	push	$0x0c		# vec_no	= c
 	jmp	exception
 _general_protection:
-	push	$13		# vector_no	= D
+	push	$0x0d		# vec_no	= d
 	jmp	exception
 _page_fault:
-	push	$14		# vector_no	= E
+	push	$0x0e		# vec_no	= e
 	jmp	exception
-_copr_error:                    # yes, it's right. 'cause INTEL has reserved the NO.15
-	push	$0xFFFFFFFF	# no err code
-	push	$16		# vector_no	= 10h
+_fpu_fault:                     # yes, it's right. 'cause INTEL has reserved 0xf
+	push	$0xffffffff	# no err code
+	push	$0x10		# vec_no	= 0x10
+	jmp	exception
+_align_fault:
+	push	$0x11		# vec_no	= 9
+	jmp	exception
+_machine_abort:
+	push	$0x12
+	jmp	exception
+_simd_fault:
+	push	$0xffffffff
+	push	$0x13
+	jmp	exception
+_ignore:
+	push	$0xffffffff
+	push	$0x14
 	jmp	exception
 
 exception:
 	call	handler_exception
-	add	$8,    %esp	# 让栈顶指向 EIP，堆栈中从顶向下依次是：EIP、CS、EFLAGS
+	add	$8,    %esp	# skip vec_no & error_code to eip - cs -eflags
         hlt
 
 
@@ -112,16 +131,26 @@ exception:
         outb    $IMRM
 
 	/*-----------------------------------------------------------------------------
-	 * OCW2, clear corresponding bit in ISR
-	 * avoid low-level INT high-level, so clear ISR manually
-	 * ICW4 0x01
+	 * OCW2, clears corresponding bit in ISR
+	 * avoid low-level one interrupts high-level one,
+	 * so set ICW4 == 0x01(manu), and clears ISR by ourself
+	 * see in kernel/init.c -- init_i8259a()
 	 * 
-	 * only master
+	 * only reset master
 	 *-----------------------------------------------------------------------------*/
         mov     $EOI,   %eax
         outb    $ICRM
 
-	/* int re-enter from here */
+	/*-----------------------------------------------------------------------------
+	 * from int-gate(excluding trap-gate), 
+	 * cpu will "cli" - exe - "sti" automatically
+	 * but here we need int-reenter, so we "sti" - exe - "cli" manually
+	 * 
+	 * whole progress: 
+	 * int - cli - exe - (sti exe cli) - exe - sti - iret
+	 *
+	 * int re-enter from here
+	 *-----------------------------------------------------------------------------*/
         sti
         call    *(irq_handler_table + \vector * 4)
         cli
@@ -159,17 +188,27 @@ _hwint07:
         outb    $IMRS
 
 	/*-----------------------------------------------------------------------------
-	 * OCW2, clear corresponding bit in ISR
-	 * avoid low-level INT high-level, so clear ISR manually
-	 * ICW4 0x01
+	 * OCW2, clears corresponding bit in ISR
+	 * avoid low-level one interrupts high-level one,
+	 * so set ICW4 == 0x01(manu), and clears ISR by ourself
+	 * see in kernel/init.c -- init_i8259a()
 	 * 
-	 * master'n slave
+	 * reset master'n slave
 	 *-----------------------------------------------------------------------------*/
         mov     $EOI,   %eax
         outb    $ICRM
         outb    $ICRS
 
-	/* int re-enter from here */
+	/*-----------------------------------------------------------------------------
+	 * from int-gate(excluding trap-gate), 
+	 * cpu will "cli" - exe - "sti" automatically
+	 * but here we need int-reenter, so we "sti" - exe - "cli" manually
+	 * 
+	 * whole progress: 
+	 * int - cli - exe - (sti exe cli) - exe - sti - iret
+	 *
+	 * int re-enter from here
+	 *-----------------------------------------------------------------------------*/
         sti
         call    *(irq_handler_table + \vector * 4)
         cli

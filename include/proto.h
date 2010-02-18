@@ -25,7 +25,12 @@ void	_segment_not_present();
 void	_stack_exception();
 void	_general_protection();
 void	_page_fault();
-void	_copr_error();
+void	_fpu_fault();
+void	_align_fault();
+void	_machine_abort();
+void	_simd_fault();
+void	_ignore();
+
 void	 _hwint00();
 void	 _hwint01();
 void	 _hwint02();

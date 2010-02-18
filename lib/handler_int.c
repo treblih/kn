@@ -52,6 +52,7 @@ void handler_exception(int vec_no, int err_code, int eip, int cs, int eflags)
 		"#AC Alignment Check",
 		"#MC Machine Check",
 		"#XF SIMD Floating-Point Exception"
+		"    Luck dude, thank to default handler"
 	};
 
 	//disp_str(err_msg[vector]);
@@ -71,7 +72,7 @@ void handler_exception(int vec_no, int err_code, int eip, int cs, int eflags)
 	disp_str("EIP:");
 	disp_int(eip);
 
-	if (err_code != 0xFFFFFFFF) {
+	if (err_code != 0xffffffff) {
 		disp_str("Error code:");
 		disp_int(err_code);
 	}
