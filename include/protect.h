@@ -5,8 +5,8 @@
 #define         SELECTOR_DUMMY      0
 #define         SELECTOR_FLAT_C     0x08
 #define         SELECTOR_FLAT_RW    0x10
-#define         SELECTOR_VIDEO      0x1b        // 0x1b = 0x18 + 3, RPL = 3
-#define         SELECTOR_CGATE      0x20        // 0x1b = 0x18 + 3, RPL = 3
+#define         SELECTOR_VIDEO      0x1b                        /* 0x1b = 0x18 + 3, RPL = 3 */
+#define         SELECTOR_CGATE      0x20
 #define         SELECTOR_TSS        0x28
 #define         SELECTOR_LDT_1ST    0x30
 
@@ -34,7 +34,7 @@
 
 #define         TI_L            1
 
-typedef struct {          //we may use the highest bit of every element, so unsigned needed
+typedef struct {          /* we may use the highest bit of every element, so unsigned needed */
         u16     limit_low;
         u16     base_low;
         u8      base_mid;

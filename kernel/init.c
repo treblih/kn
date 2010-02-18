@@ -189,31 +189,32 @@ void init_pcb()
 	PROC *t = task_table;
 
 	for (i = 0; i < PROC_SIZE;) {
-		memcpy(&(p->ldt[0]), &gdt[1], 8);
-		memcpy(&(p->ldt[1]), &gdt[2], 8);
+		memcpy(&(p->ldt[0]), &gdt[1], 8);               /* FLAT_C copy from GDT */
+		memcpy(&(p->ldt[1]), &gdt[2], 8);               /* FLAT_RW */
 
 		p->gs = SELECTOR_VIDEO | rpl;
-		// these sregs all point to LDT, not GDT, so there's 0 and 8, not 8 and 0x10
+
+		/* these sregs all point to LDT, not GDT, so there's 0 and 8, not 8 and 0x10 */
 		p->fs = 8 | TI_L << 2 | rpl;
 		p->es = 8 | TI_L << 2 | rpl;
 		p->ds = 8 | TI_L << 2 | rpl;
 		p->edi = 0;
 		p->esi = 0;
 		p->ebp = 0;
-		p->kernel_esp = 0;	//popad ignore this
+                p->kernel_esp = 0;                              /* popad ignore this */
 		p->ebx = 0;
 		p->edx = 0;
 		p->ecx = 0;
 		p->eax = 0;
 		p->ret_addr = 0;
-		p->eip = (u32) t->handler;
+		p->eip = (u32) t->handler;                      /* proc's executable codes */
 		p->cs = 0 | TI_L << 2 | rpl;
 		p->eflags = eflags;
 		p->user_esp = stack_top;
-		p->ss = 8 | TI_L << 2 | rpl;
+		p->ss = 8 | TI_L << 2 | rpl;                    /* same as above */
 
-		p->sel_ldt = SELECTOR_LDT_1ST + (i << 3);	// = 0x28, TI = RPL = 0, in GDT
-		p->ldt[0].attr_low = DA_C | dpl << 5;
+		p->sel_ldt = SELECTOR_LDT_1ST + (i << 3);	/* == 0x28, TI = RPL = 0, in GDT */
+		p->ldt[0].attr_low = DA_C | dpl << 5;           /* change 0 to 1(TASK)/3(USER) */
 		p->ldt[1].attr_low = DA_DRW | dpl << 5;
 		p->pid = i;
 		memcpy(p->name, t->name, 16);
@@ -226,27 +227,31 @@ void init_pcb()
 		p->queue_send = 0;
 		p->queue_next = 0;
 
+		/*-----------------------------------------------------------------------------
+		 *  add new GDT item for every new proc, one points to LDT in proc
+		 *-----------------------------------------------------------------------------*/
 		init_gdt_desc((SELECTOR_LDT_1ST >> 3) + i, (u32) p->ldt,
 			      LDT_SIZE * 8 - 1, DA_LDT);
 
 		stack_top -= t->stack_size;
-		p++;
-		t++;
-		i++;
+		p++;                                            /* PCB */
+		t++;                                            /* executable codes */
+		i++;                                            /* index, pid */
 
-		if (i == TASK_SIZE) {	// notice, just ==, so it's only 1 time to change them
+		if (i == TASK_SIZE) {	/* just ==, so only 1 time to change them */
 			rpl = RPL_USER;
 			dpl = DPL_USER;
-			eflags = 0x202;	// users' IOPL = 0, IF = 1
+			eflags = 0x202;	/* users' IOPL = 0, IF = 1 */
 			t = user_table;
 		}
 	}
 
+	/*-----------------------------------------------------------------------------
+	 * no matter what the PROC-0's ticks will b(including 0),
+	 * PROC-0 will always b the 1st,
+	 * 'cause we have "proc_current = 0" initialized
+	 *-----------------------------------------------------------------------------*/
 	/* here's TASK's */
-	/* 
-	 * no matter how many the proc-0's ticks will b(including 0), proc-0 will always b the 1st 
-	 * 'cause we have initialized  proc_current = 0
-	 */
 	pcb_table[0].ticks = pcb_table[0].priority = 15;
 	pcb_table[1].ticks = pcb_table[1].priority = 15;
 	pcb_table[2].ticks = pcb_table[2].priority = 15;
@@ -265,14 +270,26 @@ void init_pcb()
 	pcb_table[6].tty = 3;
 }
 
+/* 
+ * ===  FUNCTION  ======================================================================
+ *         Name:  init_tss
+ *  Description:  only 1 tss in the hole sys, like Linux from 2.6
+ * =====================================================================================
+ */
 void init_tss()
 {
+	/*-----------------------------------------------------------------------------
+	 *  struct name doesn't like array name, it's on behalf of itself, not it's addr
+	 *  so need '&'
+	 *-----------------------------------------------------------------------------*/
 	TSS *p = &tss;
+                                                                /* 0c == 08 + 3 */
+	p->ss0 = SELECTOR_FLAT_RW;	/* 0x0c works also, 'cause one int GDT, the other int LDT */
+	p->iobase = sizeof(tss);	/* means no iobase */
 
-	p->ss0 = SELECTOR_FLAT_RW;	// 0x0c works also, 'cause one int GDT, the other int LDT
-	p->iobase = sizeof(tss);	// means no iobase
-
-	// struct name doesn't like array name, it's on behalf of itself, not it's addr
+	/*-----------------------------------------------------------------------------
+	 *  init descriptor of tss in GDT
+	 *-----------------------------------------------------------------------------*/
 	init_gdt_desc(SELECTOR_TSS >> 3, (u32) & tss, sizeof(tss) - 1,
 		      DA_386TSS);
 }

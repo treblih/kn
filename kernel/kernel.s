@@ -1,13 +1,14 @@
-.include "include/sconst.inc"
+	.include "include/sconst.inc"
 
-.globl _start
-.globl _restart
-.globl _re_restart
-.globl _stack_kernel
+	.globl _start
+	.globl _restart
+	.globl _re_restart
+	.globl _stack_kernel
 
         .bss
         .align 32
-.fill 2048
+
+.fill	2048
 _stack_kernel:
 
         .text

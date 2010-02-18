@@ -24,11 +24,11 @@ ENTRYPOINT 	=	0x30400
 
 BLFLAG		=	-I boot/include/
 
-CADD		= 	-funroll-loops
+CADD		= 	-funroll-loops -gstabs
 CWARN		= 	-Wall -Wshadow -Wpointer-arith -Wunreachable-code
 CFLAGS		= 	-I include/ -c -fno-builtin -std=gnu99 $(CADD) $(CWARN)
 
-LDFLAGS		= 	-Ttext $(ENTRYPOINT) -s
+LDFLAGS		= 	-Ttext $(ENTRYPOINT)
 
 BOOT		=	boot/boot.bin
 LOADER		=	boot/loader.bin
